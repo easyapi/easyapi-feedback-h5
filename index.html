@@ -136,10 +136,10 @@
           data: obj
         }).then(res => {
           // console.log(res)
-          this.$message.success(res.data.message);
+          this.$message.success(res.data.msg);
         }).catch(error => {
-          console.log(error.response)
-          this.$message.warning(error.response.data.message);
+          console.log(error)
+          // this.$message.warning(error.response.msg);
         });
       },
 
