@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>意见反馈</title>
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+	<link rel="stylesheet" href="./css/index.css">
+	<style>
+		.el-upload--picture-card {
+			width: 76px;
+			height: 76px;
+			line-height: 76px;
+		}
+
+		.el-upload-list--picture-card .el-upload-list__item {
+			width: 76px;
+			height: 76px;
+		}
+
+		.el-upload-list--picture-card .el-upload-list__item-actions {
+			opacity: 1;
+		}
+
+		.el-upload-list--picture-card .el-upload-list__item-actions span {
+			display: block;
+			height: 76px;
+			line-height: 76px;
+		}
+
+		.el-upload .el-icon-plus {
+			line-height: 76px !important;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+
+	<div class="form flex-c">
+		<div class="form-item flex-c">
+			<span class="label">问题与意见</span>
+			<textarea class="textarea" v-model="val" placeholder="请输入您的宝贵意见"></textarea>
+		</div>
+		<div class="form-item flex-c">
+			<span class="label">上传图片</span>
+			<div class="imgs">
+				<div class="title">图片（选填，例如问题截图），最多4张</div>
+				<el-upload
+					action="https://upload.qiniup.com/"
+					:data="{key:qnKey,token:qnToken}"
+					:limit="4"
+					list-type="picture-card"
+					:on-remove="handleRemove"
+					:on-success="handleSuccess"
+					:on-error="handleFormatError"
+					@click.native="getTokenAandKey"
+					:file-list="fileList">
+					<i class="el-icon-plus"></i>
+				</el-upload>
+			</div>
+
+		</div>
+
+
+		<div class="form-item flex-c">
+			<span class="label">联系人：</span>
+			<input class="value" type="text" placeholder="请输入联系人" v-model="linkman">
+		</div>
+		<div class="form-item flex-c">
+			<span class="label">联系方式：</span>
+			<input class="value" type="text" placeholder="请输入联系方式" v-model="contact">
+		</div>
+
+		<div class="form-btn">
+			<button class="btn" @click="submit">提交</button>
+		</div>
+
+	</div>
+
+</div>
+
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+  new Vue({
+    el: '#app',
+    data() {
+      return {
+        appKey: '',
+        val: "",
+        fileList: [],
+        linkman: '',
+        contact: '',
+        qnKey: "",
+        qnToken: ""
+      }
+    },
+    created() {
+
+    },
+    mounted() {
+      // this.appKey = this.getQueryString('appKey')
+      this.appKey = "TqsC2TrMX999uMzG"
+    },
+    methods: {
+      submit() {
+        console.log(this.fileList)
+        let obj = {}
+        // if (!this.val || !this.linkman || !this.contact) {
+        //   return this.$message.warning('请将信息填写完整!');
+        // } else {
+
+          obj.linkman = this.linkman;
+          obj.contact = this.contact;
+          obj.content = this.val;
+          obj.appKey = this.appKey;
+          let imgs = "";
+          if (this.fileList.length > 0) {
+            for (let v of this.fileList) {
+              imgs += v.url + ','
+            }
+            imgs = imgs.substring(0, imgs.length - 1)
+            obj.imgs = imgs;
+          }
+
+        // }
+        console.log(obj)
+        axios({
+          method: 'post',
+          url: 'https://api2.easyapi.com/feedback',
+          data: obj
+        }).then(res => {
+          console.log(res)
+          this.$message.success(res.data.message);
+        }).catch(error => {
+          console.log(error.response)
+          this.$message.warning(error.response.data.message);
+        });
+      },
+
+
+      handleRemove(file, fileList) {
+        this.fileList = fileList
+      },
+      handleSuccess(res, file) {
+        let img = "https://qiniu.easyapi.com/" + res.key;
+        this.fileList.push({url: img, name: file.name, uid: file.uid, status: file.status})
+      },
+      handleFormatError(file) {
+        console.log(file);
+      },
+      //获取七牛token,key,
+      getTokenAandKey() {
+        this.getqiniuToken();
+        this.getqiniukey();
+      },
+      getqiniuToken() {
+        axios({
+          method: "get",
+          url: 'https://api2.easyapi.com/api/qiniu/upToken'
+        })
+          .then(res => {
+            this.qnToken = res.data.content.upToken;
+          })
+          .catch(error => {
+            console.error(error.response);
+          });
+      },
+      getqiniukey() {
+        axios({
+          method: "get",
+          url: 'https://api2.easyapi.com/api/qiniu/key'
+        })
+          .then(res => {
+            this.qnKey = res.data.content.key;
+          })
+          .catch(error => {
+            console.log(error.response);
+          });
+      },
+      getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+      }
+    }
+  })
+</script>
+</body>
+</html>
