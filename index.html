@@ -111,10 +111,6 @@
       submit() {
         console.log(this.fileList)
         let obj = {}
-        // if (!this.val || !this.linkman || !this.contact) {
-        //   return this.$message.warning('请将信息填写完整!');
-        // } else {
-
           obj.linkman = this.linkman;
           obj.contact = this.contact;
           obj.content = this.val;
@@ -128,14 +124,12 @@
             obj.imgs = imgs;
           }
 
-        // }
-        console.log(obj)
+
         axios({
           method: 'post',
           url: 'https://api2.easyapi.com/feedback',
           data: obj
         }).then(res => {
-          // console.log(res)
           this.$message.success(res.data.msg);
         }).catch(error => {
           console.log(error)
