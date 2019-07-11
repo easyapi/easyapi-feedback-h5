@@ -104,8 +104,8 @@
 
     },
     mounted() {
-      // this.appKey = this.getQueryString('appKey')
-      this.appKey = "TqsC2TrMX999uMzG"
+      this.appKey = this.getQueryString('appKey')
+      // this.appKey = "TqsC2TrMX999uMzG"
     },
     methods: {
       submit() {
@@ -135,7 +135,7 @@
           url: 'https://api2.easyapi.com/feedback',
           data: obj
         }).then(res => {
-          console.log(res)
+          // console.log(res)
           this.$message.success(res.data.message);
         }).catch(error => {
           console.log(error.response)
