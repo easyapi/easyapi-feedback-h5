@@ -109,21 +109,33 @@
     },
     methods: {
       submit() {
-        console.log(this.fileList)
         let obj = {}
-          obj.linkman = this.linkman;
-          obj.contact = this.contact;
+        obj.appKey = this.appKey;
+        let imgs = "";
+        if (!this.val) {
+          return this.$message.warning('请输入内容');
+        } else {
           obj.content = this.val;
-          obj.appKey = this.appKey;
-          let imgs = "";
-          if (this.fileList.length > 0) {
-            for (let v of this.fileList) {
-              imgs += v.url + ','
-            }
-            imgs = imgs.substring(0, imgs.length - 1)
-            obj.imgs = imgs;
-          }
+        }
 
+        if (!this.linkman) {
+          return this.$message.warning('请输入联系人');
+        } else {
+          obj.linkman = this.linkman;
+        }
+
+        if (!this.contact) {
+          return this.$message.warning('请输入联系方式');
+        } else {
+          obj.contact = this.contact;
+        }
+        if (this.fileList.length > 0) {
+          for (let v of this.fileList) {
+            imgs += v.url + ','
+          }
+          imgs = imgs.substring(0, imgs.length - 1)
+          obj.imgs = imgs;
+        }
 
         axios({
           method: 'post',
@@ -133,7 +145,7 @@
           this.$message.success(res.data.msg);
         }).catch(error => {
           console.log(error)
-          // this.$message.warning(error.response.msg);
+          this.$message.warning(error.response.data.msg);
         });
       },
 
