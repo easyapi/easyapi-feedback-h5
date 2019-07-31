@@ -85,13 +85,14 @@
 <!-- 引入组件库 -->
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
+<script src="https:///js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.0.1.52.js"></script>
 <script>
   new Vue({
     el: '#app',
     data() {
       return {
         appKey: '',
+        platform: '',
         val: "",
         fileList: [],
         linkman: '',
@@ -105,6 +106,7 @@
     },
     mounted() {
       this.appKey = this.getQueryString('appKey')
+      this.platform = this.getQueryString('platform')
       // this.appKey = "TqsC2TrMX999uMzG"
     },
     methods: {
@@ -142,7 +144,14 @@
           url: 'https://api2.easyapi.com/feedback',
           data: obj
         }).then(res => {
+          console.log(res)
+          console.log(this.platform)
           this.$message.success(res.data.msg);
+          if (this.platform === "uni-app") {
+            uni.navigateBack({
+              delta: 1
+            });
+          }
         }).catch(error => {
           console.log(error)
           this.$message.warning(error.response.data.msg);
