@@ -75,12 +75,15 @@
   </div>
 </div>
 
-<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.min.js"></script>
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https:///js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.0.1.52.js"></script>
 <script>
+  const router = new VueRouter({mode: "history"})
   new Vue({
+    router,
     el: '#app',
     data() {
       return {
@@ -95,11 +98,14 @@
       }
     },
     mounted() {
-      this.appKey = this.getQueryString('appKey')
-      this.platform = this.getQueryString('platform')
+      this.appKey = this.$route.query.appKey
+      this.platform = this.$route.query.platform
     },
     methods: {
       submit() {
+        if (this.appKey === '') {
+          return this.$message.warning('非法参数');
+        }
         let data = {}
         data.appKey = this.appKey;
         let imgs = "";
