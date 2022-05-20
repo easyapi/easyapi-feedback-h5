@@ -31,12 +31,82 @@
     .el-upload .el-icon-plus {
       line-height: 76px !important;
     }
+
+    .tab {
+      background-color: #ffffff;
+      width: 100%;
+      height: 56px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .tab-item {
+      font-size: 18px;
+      font-weight: bold;
+      padding: 17px 0;
+      color: #A1A1A1;
+    }
+
+    .my-feedback {
+      background-color: #ffffff;
+      border-radius: 0.4em
+    }
+
+
+    .feedback-top {
+      padding: 10px;
+      border-bottom: #A1A1A1 1px solid;
+    }
+
+    .feedback-bottom {
+      padding: 10px;
+    }
+
+    .feedback-img {
+      margin: 10px 0 10px 25px;
+    }
+
+    img {
+      width: 65px;
+      margin-right: 5px;
+    }
+
+    .ask-time {
+      margin-left: 25px;
+      color: #A1A1A1;
+    }
+
+    .ask {
+      background-color: #09BA07;
+      color: #ffffff;
+      font-size: 16px;
+      padding: 2px;
+      border-radius: 50%;
+    }
+
+    .answer {
+      background-color: #E54F42;
+      color: #ffffff;
+      font-size: 16px;
+      padding: 2px;
+      border-radius: 50%;
+    }
+
+    .answer-time {
+      float: right;
+      margin-top: 10px;
+      color: #A1A1A1;
+    }
   </style>
 </head>
 <body>
 <div id="app">
-
-  <div class="form flex-c">
+  <div class="tab">
+    <span @click="choice(1)" class="tab-item" :style="num==1?active:''">意见反馈</span>
+    <span @click="choice(2)" class="tab-item" :style="num==2?active:''">我的反馈</span>
+  </div>
+  <div v-if="num==1" class="form flex-c">
     <div class="form-item flex-c">
       <span class="label">问题与意见</span>
       <textarea class="textarea" v-model="val" placeholder="请输入您的宝贵意见"></textarea>
@@ -73,6 +143,31 @@
       <button class="btn" @click="submit">提交</button>
     </div>
   </div>
+  <div v-if="num==2" class="form">
+    <div v-for="item in feedbackList" class="my-feedback" @click="jump(item.feedbackId)">
+      <div class="feedback-top">
+        <p>
+          <span class="ask">问</span>
+          <span>{{item.content}}</span>
+        </p>
+        <div class="feedback-img">
+          <img v-for="img in item.imgs" :src="img">
+        </div>
+        <p class="ask-time">{{item.addTime}}</p>
+      </div>
+      <div class="feedback-bottom">
+        <p class="answer-time" v-if="!item.reply">待回复</p>
+        <div v-else>
+          <p>
+            <span class="answer">答</span>
+            <span>{{item.reply}}</span>
+          </p>
+          <p class="answer-time">{{item.updateTime}}</p>
+        </div>
+        <div style="clear:both;"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/vue@2/dist/vue.min.js"></script>
@@ -87,21 +182,74 @@
     el: '#app',
     data() {
       return {
+        num: 2,
+        active: {
+          "color": "#333333",
+          "border-bottom": "#1A8AFF 2px solid"
+        },
         appKey: '',
+        appSecret: "",
         platform: '',
         val: "",
         fileList: [],
         linkman: '',
         contact: '',
         qnKey: "",
-        qnToken: ""
+        qnToken: "",
+        feedbackList: ""
       }
     },
     mounted() {
       this.appKey = this.$route.query.appKey
+      this.appSecret = this.$route.query.appSecret
+      // this.appKey = "t31GL4o7Qi1hRuYM"
+      // this.appSecret = "j4pumag6q4imlmg3"
       this.platform = this.$route.query.platform
     },
+    watch: {
+      appKey(val) {
+        if (val) {
+          this.getFeedList()
+        }
+      }
+    },
     methods: {
+      choice(data) {
+        this.num = data
+      },
+      jump(feedbackId) {
+        window.location.href = "./detail.html?id=" + feedbackId
+      },
+      /**
+       * 获取我的意见反馈列表
+       */
+      getFeedList() {
+        let params = {
+          appKey: this.appKey,
+          appSecret: this.appSecret
+        }
+        console.log(params)
+        axios({
+          method: 'get',
+          url: 'https://api.easyapi.com/console/feedbacks',
+          // headers: { // 设置请求头
+          //   // Authorization:"Bearer " + " " + this.$route.query.token
+          //   Authorization: "Bearer " + " " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6aGFuZzIwMDg0QDEyNi5jb20iLCJhdXRoIjoiUk9MRV9BRE1JTiIsImV4cCI6MTY1NTQzMjY0MH0.UIYVqsG14fQ-Wgyt2EOOZ-oeO7voossvVmkKSZa9Ho4Yuly0UhRsS79NOdwkDHTDFYk9vqDTnLlTZGipn8bBaA"
+          // },
+          params: params
+        }).then(res => {
+          console.log(res)
+          if (res.data.code == 1) {
+            for (let feedback of res.data.content) {
+              if (feedback.imgs) {
+                feedback.imgs = feedback.imgs.split(",")
+              }
+            }
+            this.feedbackList = res.data.content
+            console.log(this.feedbackList)
+          }
+        })
+      },
       submit() {
         if (this.appKey === '') {
           return this.$message.warning('非法参数');
@@ -156,6 +304,7 @@
       handleSuccess(res, file) {
         let img = "https://qiniu.easyapi.com/" + res.key;
         this.fileList.push({url: img, name: file.name, uid: file.uid, status: file.status})
+        console.log(this.fileList)
       },
       handleFormatError(file) {
         console.log(file);
