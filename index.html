@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,248 +101,249 @@
     }
   </style>
 </head>
+
 <body>
-<div id="app">
-  <div class="tab">
-    <span @click="choice(1)" class="tab-item" :style="num==1?active:''">意见反馈</span>
-    <span @click="choice(2)" class="tab-item" :style="num==2?active:''">我的反馈</span>
-  </div>
-  <div v-if="num==1" class="form flex-c">
-    <div class="form-item flex-c">
-      <span class="label">问题与意见</span>
-      <textarea class="textarea" v-model="val" placeholder="请输入您的宝贵意见"></textarea>
+  <div id="app">
+    <div class="tab">
+      <span @click="choice(1)" class="tab-item" :style="num==1?active:''">意见反馈</span>
+      <span @click="choice(2)" class="tab-item" :style="num==2?active:''">我的反馈</span>
     </div>
-    <div class="form-item flex-c">
-      <span class="label">上传图片</span>
-      <div class="imgs">
-        <div class="title">图片（选填，例如问题截图），最多4张</div>
-        <el-upload
-          action="https://upload.qiniup.com/"
-          :data="{key:qnKey,token:qnToken}"
-          :limit="4"
-          list-type="picture-card"
-          :on-remove="handleRemove"
-          :on-success="handleSuccess"
-          :on-error="handleFormatError"
-          @click.native="getTokenAndKey"
-          :file-list="fileList">
-          <i class="el-icon-plus"></i>
-        </el-upload>
+    <div v-if="num==1" class="form flex-c">
+      <div class="form-item flex-c">
+        <span class="label">问题与意见</span>
+        <textarea class="textarea" v-model="val" placeholder="请输入您的宝贵意见"></textarea>
       </div>
-    </div>
-
-    <div class="form-item flex-c">
-      <span class="label">联系人：</span>
-      <input class="value" type="text" placeholder="请输入联系人" v-model="linkman">
-    </div>
-    <div class="form-item flex-c">
-      <span class="label">联系方式：</span>
-      <input class="value" type="text" placeholder="请输入联系方式" v-model="contact">
-    </div>
-
-    <div class="form-btn">
-      <button class="btn" @click="submit">提交</button>
-    </div>
-  </div>
-  <div v-if="num==2" class="form">
-    <div v-for="item in feedbackList" class="my-feedback" @click="jump(item.feedbackId)">
-      <div class="feedback-top">
-        <p>
-          <span class="ask">问</span>
-          <span>{{item.content}}</span>
-        </p>
-        <div class="feedback-img">
-          <img v-for="img in item.imgs" :src="img">
+      <div class="form-item flex-c">
+        <span class="label">上传图片</span>
+        <div class="imgs">
+          <div class="title">图片（选填，例如问题截图），最多4张</div>
+          <el-upload action="https://upload.qiniup.com/" :data="{key:qnKey,token:qnToken}" :limit="4"
+            list-type="picture-card" :on-remove="handleRemove" :on-success="handleSuccess" :on-error="handleFormatError"
+            @click.native="getTokenAndKey" :file-list="fileList">
+            <i class="el-icon-plus"></i>
+          </el-upload>
         </div>
-        <p class="ask-time">{{item.addTime}}</p>
       </div>
-      <div class="feedback-bottom">
-        <p class="answer-time" v-if="!item.reply">待回复</p>
-        <div v-else>
+
+      <div class="form-item flex-c">
+        <span class="label">联系人：</span>
+        <input class="value" type="text" placeholder="请输入联系人" v-model="linkman">
+      </div>
+      <div class="form-item flex-c">
+        <span class="label">联系方式：</span>
+        <input class="value" type="text" placeholder="请输入联系方式" v-model="contact">
+      </div>
+
+      <div class="form-btn">
+        <button class="btn" @click="submit">提交</button>
+      </div>
+    </div>
+    <div v-if="num==2" class="form">
+      <div v-for="item in feedbackList" class="my-feedback" @click="jump(item.feedbackId)">
+        <div class="feedback-top">
           <p>
-            <span class="answer">答</span>
-            <span>{{item.reply}}</span>
+            <span class="ask">问</span>
+            <span>{{item.content}}</span>
           </p>
-          <p class="answer-time">{{item.updateTime}}</p>
+          <div class="feedback-img">
+            <img v-for="img in item.imgs" :src="img">
+          </div>
+          <p class="ask-time">{{item.addTime}}</p>
         </div>
-        <div style="clear:both;"></div>
+        <div class="feedback-bottom">
+          <p class="answer-time" v-if="!item.reply">待回复</p>
+          <div v-else>
+            <p>
+              <span class="answer">答</span>
+              <span>{{item.reply}}</span>
+            </p>
+            <p class="answer-time">{{item.updateTime}}</p>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script src="https://unpkg.com/vue@2/dist/vue.min.js"></script>
-<script src="https://unpkg.com/vue-router@2/dist/vue-router.min.js"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https:///js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.0.1.52.js"></script>
-<script>
-  const router = new VueRouter({mode: "history"})
-  new Vue({
-    router,
-    el: '#app',
-    data() {
-      return {
-        num: 2,
-        active: {
-          "color": "#333333",
-          "border-bottom": "#1A8AFF 2px solid"
+  <script src="https://unpkg.com/vue@2/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/vue-router@2/dist/vue-router.min.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https:///js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.0.1.52.js"></script>
+  <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+  <script>
+    const router = new VueRouter({ mode: "history" })
+    new Vue({
+      router,
+      el: '#app',
+      data() {
+        return {
+          num: 2,
+          active: {
+            "color": "#333333",
+            "border-bottom": "#1A8AFF 2px solid"
+          },
+          appKey: '',
+          appSecret: "",
+          platform: '',
+          val: "",
+          fileList: [],
+          linkman: '',
+          contact: '',
+          qnKey: "",
+          qnToken: "",
+          feedbackList: ""
+        }
+      },
+      mounted() {
+        this.appKey = this.$route.query.appKey
+        this.appSecret = this.$route.query.appSecret
+        // this.appKey = "t31GL4o7Qi1hRuYM"
+        // this.appSecret = "j4pumag6q4imlmg3"
+        this.platform = this.$route.query.platform
+      },
+      watch: {
+        appKey(val) {
+          if (val) {
+            this.getFeedList()
+          }
+        }
+      },
+      methods: {
+        choice(data) {
+          this.num = data
         },
-        appKey: '',
-        appSecret: "",
-        platform: '',
-        val: "",
-        fileList: [],
-        linkman: '',
-        contact: '',
-        qnKey: "",
-        qnToken: "",
-        feedbackList: ""
-      }
-    },
-    mounted() {
-      this.appKey = this.$route.query.appKey
-      this.appSecret = this.$route.query.appSecret
-      // this.appKey = "t31GL4o7Qi1hRuYM"
-      // this.appSecret = "j4pumag6q4imlmg3"
-      this.platform = this.$route.query.platform
-    },
-    watch: {
-      appKey(val) {
-        if (val) {
-          this.getFeedList()
-        }
-      }
-    },
-    methods: {
-      choice(data) {
-        this.num = data
-      },
-      jump(feedbackId) {
-        window.location.href = "./detail.html?id=" + feedbackId
-      },
-      /**
-       * 获取我的意见反馈列表
-       */
-      getFeedList() {
-        let params = {
-          appKey: this.appKey,
-          appSecret: this.appSecret
-        }
-        console.log(params)
-        axios({
-          method: 'get',
-          url: 'https://api.easyapi.com/console/feedbacks',
-          // headers: { // 设置请求头
-          //   // Authorization:"Bearer " + " " + this.$route.query.token
-          //   Authorization: "Bearer " + " " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6aGFuZzIwMDg0QDEyNi5jb20iLCJhdXRoIjoiUk9MRV9BRE1JTiIsImV4cCI6MTY1NTQzMjY0MH0.UIYVqsG14fQ-Wgyt2EOOZ-oeO7voossvVmkKSZa9Ho4Yuly0UhRsS79NOdwkDHTDFYk9vqDTnLlTZGipn8bBaA"
-          // },
-          params: params
-        }).then(res => {
-          console.log(res)
-          if (res.data.code == 1) {
-            for (let feedback of res.data.content) {
-              if (feedback.imgs) {
-                feedback.imgs = feedback.imgs.split(",")
+        jump(feedbackId) {
+          window.location.href = "./detail.html?id=" + feedbackId
+        },
+        /**
+         * 获取我的意见反馈列表
+         */
+        getFeedList() {
+          let params = {
+            appKey: this.appKey,
+            appSecret: this.appSecret
+          }
+          console.log(params)
+          axios({
+            method: 'get',
+            url: 'https://api.easyapi.com/console/feedbacks',
+            // headers: { // 设置请求头
+            //   // Authorization:"Bearer " + " " + this.$route.query.token
+            //   Authorization: "Bearer " + " " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6aGFuZzIwMDg0QDEyNi5jb20iLCJhdXRoIjoiUk9MRV9BRE1JTiIsImV4cCI6MTY1NTQzMjY0MH0.UIYVqsG14fQ-Wgyt2EOOZ-oeO7voossvVmkKSZa9Ho4Yuly0UhRsS79NOdwkDHTDFYk9vqDTnLlTZGipn8bBaA"
+            // },
+            params: params
+          }).then(res => {
+            console.log(res)
+            if (res.data.code == 1) {
+              for (let feedback of res.data.content) {
+                if (feedback.imgs) {
+                  feedback.imgs = feedback.imgs.split(",")
+                }
               }
+              this.feedbackList = res.data.content
+              console.log(this.feedbackList)
             }
-            this.feedbackList = res.data.content
-            console.log(this.feedbackList)
+          })
+        },
+        submit() {
+          if (this.appKey === '') {
+            return this.$message.warning('非法参数');
           }
-        })
-      },
-      submit() {
-        if (this.appKey === '') {
-          return this.$message.warning('非法参数');
-        }
-        let data = {}
-        data.appKey = this.appKey;
-        let imgs = "";
-        if (!this.val) {
-          return this.$message.warning('请输入内容');
-        } else {
-          data.content = this.val;
-        }
-
-        if (!this.linkman) {
-          return this.$message.warning('请输入联系人');
-        } else {
-          data.linkman = this.linkman;
-        }
-
-        if (!this.contact) {
-          return this.$message.warning('请输入联系方式');
-        } else {
-          data.contact = this.contact;
-        }
-        if (this.fileList.length > 0) {
-          for (let v of this.fileList) {
-            imgs += v.url + ','
+          let data = {}
+          data.appKey = this.appKey;
+          let imgs = "";
+          if (!this.val) {
+            return this.$message.warning('请输入内容');
+          } else {
+            data.content = this.val;
           }
-          imgs = imgs.substring(0, imgs.length - 1)
-          data.imgs = imgs;
-        }
 
-        axios({
-          method: 'post',
-          url: 'https://api.easyapi.com/feedback',
-          data: data
-        }).then(res => {
-          this.$message.success(res.data.msg);
-          if (this.platform === "uni-app") {
-            uni.navigateBack({
-              delta: 1
-            });
+          if (!this.linkman) {
+            return this.$message.warning('请输入联系人');
+          } else {
+            data.linkman = this.linkman;
           }
-        }).catch(error => {
-          console.log(error)
-          this.$message.warning(error.response.data.msg);
-        });
-      },
-      handleRemove(file, fileList) {
-        this.fileList = fileList
-      },
-      handleSuccess(res, file) {
-        let img = "https://qiniu.easyapi.com/" + res.key;
-        this.fileList.push({url: img, name: file.name, uid: file.uid, status: file.status})
-        console.log(this.fileList)
-      },
-      handleFormatError(file) {
-        console.log(file);
-      },
-      //获取七牛token,key,
-      getTokenAndKey() {
-        this.getQiniuToken();
-        this.getQiniuKey();
-      },
-      getQiniuToken() {
-        axios({
-          method: "get",
-          url: 'https://api.easyapi.com/qiniu/upToken'
-        }).then(res => {
-          this.qnToken = res.data.content.upToken;
-        }).catch(error => {
-          console.error(error.response);
-        });
-      },
-      getQiniuKey() {
-        axios({
-          method: "get",
-          url: 'https://api.easyapi.com/qiniu/key'
-        }).then(res => {
-          this.qnKey = res.data.content.key;
-        }).catch(error => {
-          console.log(error.response);
-        });
-      },
-      getQueryString(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-        var r = window.location.search.substr(1).match(reg);
-        if (r != null) return unescape(r[2]);
-        return null;
+
+          if (!this.contact) {
+            return this.$message.warning('请输入联系方式');
+          } else {
+            data.contact = this.contact;
+          }
+          if (this.fileList.length > 0) {
+            for (let v of this.fileList) {
+              imgs += v.url + ','
+            }
+            imgs = imgs.substring(0, imgs.length - 1)
+            data.imgs = imgs;
+          }
+
+          axios({
+            method: 'post',
+            url: 'https://api.easyapi.com/feedback',
+            data: data
+          }).then(res => {
+            this.$message.success(res.data.msg);
+            if (this.platform === "uni-app") {
+              uni.navigateBack({
+                delta: 1
+              });
+            }
+            if (this.platform === "WeiXin") {
+              wx.miniProgram.navigateBack({
+                delta: 1,
+              })
+            }
+          }).catch(error => {
+            console.log(error)
+            this.$message.warning(error.response.data.msg);
+          });
+        },
+        handleRemove(file, fileList) {
+          this.fileList = fileList
+        },
+        handleSuccess(res, file) {
+          let img = "https://qiniu.easyapi.com/" + res.key;
+          this.fileList.push({ url: img, name: file.name, uid: file.uid, status: file.status })
+          console.log(this.fileList)
+        },
+        handleFormatError(file) {
+          console.log(file);
+        },
+        //获取七牛token,key,
+        getTokenAndKey() {
+          this.getQiniuToken();
+          this.getQiniuKey();
+        },
+        getQiniuToken() {
+          axios({
+            method: "get",
+            url: 'https://api.easyapi.com/qiniu/upToken'
+          }).then(res => {
+            this.qnToken = res.data.content.upToken;
+          }).catch(error => {
+            console.error(error.response);
+          });
+        },
+        getQiniuKey() {
+          axios({
+            method: "get",
+            url: 'https://api.easyapi.com/qiniu/key'
+          }).then(res => {
+            this.qnKey = res.data.content.key;
+          }).catch(error => {
+            console.log(error.response);
+          });
+        },
+        getQueryString(name) {
+          var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+          var r = window.location.search.substr(1).match(reg);
+          if (r != null) return unescape(r[2]);
+          return null;
+        }
       }
-    }
-  })
-</script>
+    })
+  </script>
 </body>
+
 </html>
