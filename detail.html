@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>反馈详情</title>
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
   <link rel="stylesheet" href="./css/index.css">
   <style>
     .main {
@@ -24,80 +25,92 @@
     .color-A7A7A7 {
       color: #A7A7A7;
     }
+
   </style>
 </head>
+
 <body>
-<div id="app">
-  <div class="form">
-    <div class="main mg-b-10">
-      <div>
-        <h3 class="mg-b-10">问题与意见</h3>
-        <p class="mg-b-10 color-A7A7A7">{{feedbackForm.content}}</p>
-        <h3 class="mg-b-10">图片</h3>
-        <img v-for="item in feedbackForm.imgs" class="mg-b-10" style="width: 65px"
-             :src="item">
+  <div id="app">
+    <div class="form">
+      <div class="main mg-b-10">
+        <div>
+          <h3 class="mg-b-10">问题与意见</h3>
+          <p class="mg-b-10 color-A7A7A7">{{feedbackForm.content}}</p>
+          <h3 class="mg-b-10">图片</h3>
+          <img v-for="item in feedbackForm.imgs" class="mg-b-10" style="width: 65px" :src="item">
+        </div>
+        <p class="float-r">{{feedbackForm.addTime}}</p>
+        <div style="clear: both"></div>
       </div>
-      <p class="float-r">{{feedbackForm.addTime}}</p>
-      <div style="clear: both"></div>
-    </div>
-    <div class="main">
-      <h3 class="mg-b-10">客户回复</h3>
-      <p class="float-r color-A7A7A7" v-if="!feedbackForm.reply">未回复</p>
-      <div v-else>
-        <p class="mg-b-10 color-A7A7A7">{{feedbackForm.reply}}</p>
-        <p class="float-r color-A7A7A7">2017-05-02 18:23:32</p>
+      <div class="main">
+        <h3 class="mg-b-10">客户回复</h3>
+        <p class="float-r color-A7A7A7" v-if="!feedbackForm.reply">未回复</p>
+        <div v-else>
+          <p class="mg-b-10 color-A7A7A7">{{feedbackForm.reply}}</p>
+          <p class="float-r color-A7A7A7">2017-05-02 18:23:32</p>
+        </div>
+        <div style="clear: both"></div>
       </div>
-      <div style="clear: both"></div>
     </div>
   </div>
-</div>
 
-<script src="https://unpkg.com/vue@2/dist/vue.min.js"></script>
-<script src="https://unpkg.com/vue-router@2/dist/vue-router.min.js"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https:///js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.0.1.52.js"></script>
-<script>
-  const router = new VueRouter({mode: "history"})
-  new Vue({
-    router,
-    el: '#app',
-    data() {
-      return {
-        feedbackForm: {
-          content: "",
-          imgs: [],
-          addTime: "",
-          reply: ""
+  <script src="https://cdn.staticfile.org/vue/3.2.36/vue.global.min.js"></script>
+  <script src="https://cdn.staticfile.org/vue-router/4.0.11/vue-router.global.min.js"></script>
+  <script src="https://unpkg.com/element-plus"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https:///js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.0.1.52.js"></script>
+  <script>
+    const routes = []
+    const router = VueRouter.createRouter({
+      history: VueRouter.createWebHashHistory(),
+      routes,
+    })
+    const appHtml = {
+      router,
+      el: '#app',
+      data() {
+        return {
+          feedbackForm: {
+            content: "",
+            imgs: [],
+            addTime: "",
+            reply: ""
+          }
         }
-      }
-    },
-    mounted() {
-      this.getDetail(this.$route.query.id, this.$route.query.appKey, this.$route.query.appSecret)
-    },
-    methods: {
-      getDetail(id, appKey, appSecret) {
-        let params = {
-          appKey: appKey,
-          appSecret: appSecret
-          // appKey: "t31GL4o7Qi1hRuYM",
-          // appSecret: "j4pumag6q4imlmg3"
+      },
+      mounted() {
+        this.getDetail(this.$route.query.id, this.$route.query.appKey, this.$route.query.appSecret)
+      },
+      methods: {
+        getDetail(id, appKey, appSecret) {
+          let params = {
+            appKey: appKey,
+            appSecret: appSecret
+            // appKey: "t31GL4o7Qi1hRuYM",
+            // appSecret: "j4pumag6q4imlmg3"
+          }
+          axios({
+            method: 'get',
+            url: `https://api.easyapi.com/console/feedback/${id}`,
+            // headers: { // 设置请求头
+            //   // Authorization:"Bearer " + " " + this.$route.query.token
+            //   Authorization: "Bearer " + " " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6aGFuZzIwMDg0QDEyNi5jb20iLCJhdXRoIjoiUk9MRV9BRE1JTiIsImV4cCI6MTY1NTQzMjY0MH0.UIYVqsG14fQ-Wgyt2EOOZ-oeO7voossvVmkKSZa9Ho4Yuly0UhRsS79NOdwkDHTDFYk9vqDTnLlTZGipn8bBaA"
+            // },
+            params: params
+          }).then(res => {
+            res.data.content.imgs = res.data.content.imgs.split(",")
+            this.feedbackForm = res.data.content
+          })
         }
-        axios({
-          method: 'get',
-          url: `https://api.easyapi.com/console/feedback/${id}`,
-          // headers: { // 设置请求头
-          //   // Authorization:"Bearer " + " " + this.$route.query.token
-          //   Authorization: "Bearer " + " " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6aGFuZzIwMDg0QDEyNi5jb20iLCJhdXRoIjoiUk9MRV9BRE1JTiIsImV4cCI6MTY1NTQzMjY0MH0.UIYVqsG14fQ-Wgyt2EOOZ-oeO7voossvVmkKSZa9Ho4Yuly0UhRsS79NOdwkDHTDFYk9vqDTnLlTZGipn8bBaA"
-          // },
-          params: params
-        }).then(res => {
-          res.data.content.imgs = res.data.content.imgs.split(",")
-          this.feedbackForm = res.data.content
-        })
       }
     }
-  })
-</script>
+
+    const app = Vue.createApp(appHtml)
+    app.use(ElementPlus);
+    app.use(router);
+    app.mount('#app');
+
+  </script>
 </body>
+
 </html>

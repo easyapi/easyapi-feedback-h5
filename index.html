@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>意见反馈</title>
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
   <link rel="stylesheet" href="./css/index.css">
   <style>
     .el-upload--picture-card {
@@ -99,6 +99,7 @@
       margin-top: 10px;
       color: #A1A1A1;
     }
+
   </style>
 </head>
 
@@ -165,17 +166,19 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/vue@2/dist/vue.min.js"></script>
-  <script src="https://unpkg.com/vue-router@2/dist/vue-router.min.js"></script>
-  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://cdn.staticfile.org/vue/3.2.36/vue.global.min.js"></script>
+  <script src="https://cdn.staticfile.org/vue-router/4.0.11/vue-router.global.min.js"></script>
+  <script src="https://unpkg.com/element-plus"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https:///js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.0.1.52.js"></script>
   <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
   <script>
-    const router = new VueRouter({ mode: "history" })
-    new Vue({
-      router,
-      el: '#app',
+    const routes = []
+    const router = VueRouter.createRouter({
+      history: VueRouter.createWebHashHistory(),
+      routes,
+    })
+    const appHtml = {
       data() {
         return {
           num: 2,
@@ -304,7 +307,12 @@
         },
         handleSuccess(res, file) {
           let img = "https://qiniu.easyapi.com/" + res.key;
-          this.fileList.push({ url: img, name: file.name, uid: file.uid, status: file.status })
+          this.fileList.push({
+            url: img,
+            name: file.name,
+            uid: file.uid,
+            status: file.status
+          })
           console.log(this.fileList)
         },
         handleFormatError(file) {
@@ -342,7 +350,12 @@
           return null;
         }
       }
-    })
+    }
+    const app = Vue.createApp(appHtml)
+    app.use(ElementPlus);
+    app.use(router);
+    app.mount('#app');
+
   </script>
 </body>
 
